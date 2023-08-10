@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Chela+One&display=swap');
 
-
 .logo {
   font-family: 'Chela One', cursive;
   font-size: 30px;
@@ -27,10 +26,117 @@
   object-fit: cover;
 }
 
-/* .modal-container {} */
+.my-spinner {
+  font-size: 100px;
+}
 
+.blog-creation {
+  width: 50vw;
+}
 
 .modal-image {
   width: 90%;
   object-fit: cover;
 }
+
+
+/* ---------------------------------------------------------- NAVBAR START */
+
+
+.menu {
+  background-color: rgba(1, 249, 249, 0.6);
+  backdrop-filter: blur(5px);
+}
+
+.menu-hamburger {
+  background-color: white;
+}
+
+
+/* ---------------------------------------------------------- NAVBAR END */
+
+
+
+
+/* ---------------------------------------------------------- LOADER START */
+
+
+
+.center {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 30vh;
+}
+
+
+.ring {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  animation: ring 2s linear infinite;
+}
+
+@keyframes ring {
+  0% {
+    transform: rotate(0deg);
+    box-shadow: 1px 5px 2px #e65c00;
+  }
+
+  25% {
+    transform: rotate(90deg);
+    box-shadow: 1px 5px 2px #fb02c5;
+  }
+
+  50% {
+    transform: rotate(180deg);
+    box-shadow: 1px 5px 2px #18b201;
+  }
+
+  75% {
+    transform: rotate(270deg);
+    box-shadow: 1px 5px 2px #f7e202;
+  }
+
+  100% {
+    transform: rotate(360deg);
+    box-shadow: 1px 5px 2px #0456c8;
+  }
+}
+
+
+.ring:before {
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(255, 255, 255, .3);
+}
+
+
+.center span {
+  color: #737373;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 100px;
+  animation: text 2s ease-in-out infinite;
+  animation-fill-mode: forwards;
+}
+
+
+@keyframes text {
+  50% {
+    color: black;
+    font-weight: bold;
+  }
+}
+
+
+
+/* ---------------------------------------------------------- LOADER END */

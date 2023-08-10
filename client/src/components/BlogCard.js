@@ -1,29 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export default function BlogCard({ title, description, image, username, time, id, isUser }) {
 
   const navigate = useNavigate();
 
-  console.log(username);
-
   const handleEdit = () => navigate(`/blog-details/${id}`);
 
-  const handleDelete = async () => {
-    try {
-      const { data } = await axios.delete(`/api/v1/blog/delete-blog/${id}`);
-      if (data?.success) {
-        alert("Blog Deleted");
-        window.location.reload();
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const handleDelete = () => {
+    navigate(`/delete-blog/${id}`)
+    toast.success("Blog Deleted Successfully");
   };
 
   const formatDate = (date) => {
-    const monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December",];
+    const monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     let day = date.getDate();
     let monthNum = date.getMonth();
     let year = date.getFullYear();
@@ -31,8 +22,8 @@ export default function BlogCard({ title, description, image, username, time, id
   }
 
   const formatTime = (date) => {
-    const time = date.toLocaleTimeString();
-    return time;
+    const readableTime = date.toLocaleTimeString();
+    return readableTime;
   }
 
   return (
@@ -69,8 +60,8 @@ export default function BlogCard({ title, description, image, username, time, id
                   </div>
                   {
                     time.post != time.edit && (
-                      <div className="d-flex flex-column" style={{ fontSize: "12px" }}>
-                        <span className="fw-bold">Edited: {formatDate(new Date())} </span>
+                      <div className="d-flex flex-column align-items-end" style={{ fontSize: "12px" }}>
+                        <span className="fw-bold">Last Updated: {formatDate(new Date())} </span>
                         <span>{formatTime(new Date(time.edit))} </span>
                       </div>
                     )
@@ -80,23 +71,27 @@ export default function BlogCard({ title, description, image, username, time, id
             </div>
 
 
-
-            <div className="row">
-
-              {/* -------------------------------------------------------------------------- MODAL HANDLER STARTS */}
-
-
-              <div className="col-md-4" data-bs-toggle="modal" data-bs-target={`#exampleModal${id}`}>
-                <img src={image} className="card-img-left m-3 shadow-lg" alt="blogs" />
-              </div>
+            <div className="card-body">
+              <div className="row">
+                <div className="d-md-flex gap-3 px-3">
+                  {/* -------------------------------------------------------------------------- MODAL HANDLER STARTS */}
 
 
-              {/* -------------------------------------------------------------------------- MODAL HANDLER END*/}
+                  <div className="col-md-4" type="button" data-bs-toggle="modal" data-bs-target={`#blogModal${id}`}>
+                    <div className="d-flex justify-content-center">
+                      <img src={image} className="card-img-left shadow-lg" alt="blogs" />
+                    </div>
+                  </div>
 
-              <div className="col-md-8">
-                <div className="card-body d-flex flex-column justify-content-center">
-                  <h6 className="card-title">Title: {title}</h6>
-                  <p className="card-text">Description: {description.length > 250 ? description.substring(0, 250) + '...' : description}</p>
+
+                  {/* -------------------------------------------------------------------------- MODAL HANDLER END*/}
+
+                  <div className="col-md-8">
+                    <div className="d-flex flex-column justify-content-center mt-3 mt-md-0">
+                      <h6 className="card-title fw-bold">Title: {title}</h6>
+                      <p className="card-text" style={{ textAlign: "justify", paddingRight: "10px" }}>Description: {description.length > 250 ? description.substring(0, 250) + '...' : description}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -107,7 +102,7 @@ export default function BlogCard({ title, description, image, username, time, id
 
             <div className="row">
               <div className="col-md">
-                <div className="modal fade" id={`exampleModal${id}`} tabindex="-1" aria-labelledby={`exampleModalLabel${id}`} aria-hidden="true">
+                <div className="modal fade" id={`blogModal${id}`} tabindex="-1" aria-labelledby={`exampleModalLabel${id}`} aria-hidden="true">
                   <div className="modal-dialog modal-lg modal-dialog-scrollable">
                     <div className="modal-content">
                       <div className="modal-header">
@@ -139,7 +134,7 @@ export default function BlogCard({ title, description, image, username, time, id
           </div>
         </div>
         <div className="col-md-2"></div>
-      </div>
+      </div >
     </>
   )
 }

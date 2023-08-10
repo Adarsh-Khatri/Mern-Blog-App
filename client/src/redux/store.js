@@ -20,3 +20,29 @@ export const authActions = authSlice.actions;
 export const store = configureStore({
   reducer: authSlice.reducer,
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const MyAuthContext = createContext(false);
+
+// const initialState = false;
+
+// const reducer = (state = initialState, action) => {
+//   if (action.type === 'LOGIN') return true;
+//   if (action.type === 'LOGOUT') return false;
+// }
+
+// export { reducer };
+

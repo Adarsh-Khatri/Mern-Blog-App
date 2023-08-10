@@ -29,10 +29,10 @@ app.use("/api/v1/blog", blogRoutes);
 
 // Port
 const PORT = process.env.PORT || 8080;
+
 //listen
 app.listen(PORT, () => {
   console.log(
-    `Server Running on ${process.env.DEV_MODE} mode port no ${PORT}`.bgCyan
-      .white
+    `Server Running on ${process.env.DEV_MODE} mode port no ${PORT}`.bgCyan.white
   );
 });

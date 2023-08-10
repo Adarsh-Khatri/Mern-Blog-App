@@ -1,111 +1,99 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, TextField, Button } from "@mui/material";
-import toast from "react-hot-toast";
 import axios from "axios";
-const Register = () => {
+import toast from "react-hot-toast";
+import { useFormik } from 'formik';
+import { postApi } from "../services/httpServices";
+
+const Login = () => {
   const navigate = useNavigate();
-  //state
-  const [inputs, setInputs] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
 
-  //handle input change
-  const handleChange = (e) => {
-    setInputs((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
-  };
 
-  //form handle
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // ------------------------------------------------------------------------------------------- REGISTER CREDENTIALS
+
+
+  const inputs = { name: "", email: "", password: "" }
+
+
+  // ------------------------------------------------------------------------------------------- HANDLING SUBMIT
+
+
+  const onSubmit = async (values) => {
+
+    let { name, email, password } = values;
+
     try {
-      const { data } = await axios.post("/api/v1/user/register", {
-        username: inputs.name,
-        email: inputs.email,
-        password: inputs.password,
-      });
+      const data = await postApi("/api/v1/user/register", { username: name, email, password })
       if (data.success) {
-        toast.success("User Register Successfully");
+        toast.success(data.message);
         navigate("/login");
+      } else {
+        throw new Error(data.message)
       }
     } catch (error) {
-      console.log(error);
+      let { response } = error;
+      toast.error(response.data.message);
     }
   };
-  return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <Box
-          maxWidth={450}
-          display="flex"
-          flexDirection={"column"}
-          alignItems="center"
-          justifyContent={"center"}
-          margin="auto"
-          marginTop={5}
-          boxShadow="10px 10px 20px #ccc"
-          padding={3}
-          borderRadius={5}
-        >
-          <Typography
-            variant="h4"
-            sx={{ textTransform: "uppercase" }}
-            padding={3}
-            textAlign="center"
-          >
-            Register
-          </Typography>
-          <TextField
-            placeholder="name"
-            value={inputs.name}
-            onChange={handleChange}
-            name="name"
-            margin="normal"
-            type={"text"}
-            required
-          />
-          <TextField
-            placeholder="email"
-            value={inputs.email}
-            name="email"
-            margin="normal"
-            type={"email"}
-            required
-            onChange={handleChange}
-          />
-          <TextField
-            placeholder="password"
-            value={inputs.password}
-            name="password"
-            margin="normal"
-            type={"password"}
-            required
-            onChange={handleChange}
-          />
 
-          <Button
-            type="submit"
-            sx={{ borderRadius: 3, marginTop: 3 }}
-            variant="contained"
-            color="primary"
-          >
-            Submit
-          </Button>
-          <Button
-            onClick={() => navigate("/login")}
-            sx={{ borderRadius: 3, marginTop: 3 }}
-          >
-            Already Registerd ? Please Login
-          </Button>
-        </Box>
-      </form>
-    </>
+
+  // ------------------------------------------------------------------------------------------- FORMIK
+
+
+  const formik = useFormik({
+    initialValues: inputs,
+    onSubmit
+  })
+
+
+  return (
+    <div className="container">
+      <div className="row">
+        <form className="my-5 w-50 mx-auto" onSubmit={formik.handleSubmit}>
+          <div className="row">
+            <div className="border p-5 shadow-lg rounded rounded-5">
+              <div className="row">
+                <h1 className="text-center">Register</h1>
+              </div>
+              <div className="row">
+                <div className="form-group my-3">
+                  <label htmlFor="name" className="form-label lead fw-bold">Name</label>
+                  <input type="name" id="name" name="name" value={formik.values.name} className="form-control py-3" placeholder="Name" onChange={formik.handleChange} />
+                </div>
+                <div className="form-group my-3">
+                  <label htmlFor="email" className="form-label lead fw-bold">Email</label>
+                  <input type="email" id="email" name="email" value={formik.values.email} className="form-control py-3" placeholder="Email" onChange={formik.handleChange} />
+                </div>
+                <div className="form-group my-3">
+                  <label htmlFor="password" className="form-label lead fw-bold">Password</label>
+                  <input type="password" id="password" name="password" value={formik.values.password} className="form-control py-3" placeholder="Password" onChange={formik.handleChange} />
+                </div>
+              </div>
+              <div className="row">
+                <div className="text-center my-2">
+                  <button type="submit" className="btn btn-primary rounded-3">Submit</button>
+                </div>
+              </div>
+              <div className="row">
+                <div className="text-center mt-4">
+                  <button type="button" className="btn text-primary btn-sm border-0" onClick={() => navigate("/login")}>
+                    Already Registerd ? Please Login
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
-export default Register;
+export default Login;
+
+
+
+// Warning: An unhandled error was caught from submitForm() TypeError: Cannot read properties of undefined(reading 'data') WHY I AM THIS ERROR??
+
+
+

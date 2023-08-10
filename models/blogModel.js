@@ -4,7 +4,7 @@ const blogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      require: [true, "title is required"],
+      required: [true, "title is required"],
     },
     description: {
       type: String,
@@ -17,7 +17,7 @@ const blogSchema = new mongoose.Schema(
     user: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      require: [true, "user id is required"],
+      required: [true, "user id is required"],
     },
   },
   { timestamps: true }
@@ -26,3 +26,5 @@ const blogSchema = new mongoose.Schema(
 const blogModel = mongoose.model("Blog", blogSchema);
 
 module.exports = blogModel;
+
+

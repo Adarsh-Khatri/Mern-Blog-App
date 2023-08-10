@@ -1,22 +1,31 @@
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
-//create user register user
+
+
+// ----------------------------------------------------------------------------- REGISTERING USER
+
+
 exports.registerController = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+
+    console.log('REGISTER BODY: ', req.body);
+
     //validation
     if (!username || !email || !password) {
       return res.status(400).send({
         success: false,
-        message: "Please Fill all fields",
+        message: "Please Provide All Credentials",
       });
     }
+    
     //exisiting user
     const exisitingUser = await userModel.findOne({ email });
+
     if (exisitingUser) {
       return res.status(401).send({
         success: false,
-        message: "user already exisits",
+        message: "Email Already Exists",
       });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,40 +35,46 @@ exports.registerController = async (req, res) => {
     await user.save();
     return res.status(201).send({
       success: true,
-      message: "New User Created",
+      message: "Registered Successfully",
       user,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({
-      message: "Error In Register callback",
+      message: "Error In Registering User",
       success: false,
       error,
     });
   }
 };
 
-// get all users
+
+
+// ------------------------------------------------------------------------------------- GET ALL USERS
+
+
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await userModel.find({});
     return res.status(200).send({
       userCount: users.length,
       success: true,
-      message: "all users data",
+      message: "All Users Data",
       users,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({
       success: false,
-      message: "Error In Get ALl Users",
+      message: "Error In Get All Users",
       error,
     });
   }
 };
 
-//login
+
+
+// ---------------------------------------------------------------------------------------------- LOGIN USER
+
+
 exports.loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -67,34 +82,41 @@ exports.loginController = async (req, res) => {
     if (!email || !password) {
       return res.status(401).send({
         success: false,
-        message: "Please provide email or password",
+        message: "Please Provide All Credentials",
       });
     }
+
     const user = await userModel.findOne({ email });
+
     if (!user) {
-      return res.status(200).send({
+      return res.status(401).send({
         success: false,
-        message: "email is not registerd",
+        message: "Email Is Not Registered",
       });
     }
-    //password
+
+
+    // ------------------------------------------------------------------------------ VALIDATING PASSWORD
+
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).send({
         success: false,
-        message: "Invlid username or password",
+        message: "Invalid Password",
       });
     }
+
     return res.status(200).send({
       success: true,
-      messgae: "login successfully",
+      message: "Login Successfully",
       user,
     });
+
   } catch (error) {
-    console.log(error);
     return res.status(500).send({
       success: false,
-      message: "Error In Login Callcback",
+      message: "Error In Login User",
       error,
     });
   }
@@ -105,7 +127,6 @@ exports.loginController = async (req, res) => {
 exports.getUserById = async (req, res) => {
   try {
     let { userId } = req.params;
-    console.log(userId);
     if (!userId) {
       return res.status(400).send({
         success: false,
@@ -113,8 +134,6 @@ exports.getUserById = async (req, res) => {
       });
     }
     let user = await userModel.findById(userId);
-    console.log('USER :', user);
-    console.log('ID : ', userId);
     if (!user) {
       return res.status(400).send({
         success: false,
@@ -127,7 +146,6 @@ exports.getUserById = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({
       success: false,
       message: "Error In Login Callcback",

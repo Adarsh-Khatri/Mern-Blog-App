@@ -2,10 +2,12 @@ const mongoose = require("mongoose");
 const blogModel = require("../models/blogModel");
 const userModel = require("../models/userModel");
 
-//GET ALL BLOGS
+// ------------------------------------------------------------------------------------- GET ALL BLOGS
+
+
 exports.getAllBlogsController = async (req, res) => {
   try {
-    const blogs = await blogModel.find({}).populate("user");
+    const blogs = await blogModel.find().populate("user");
     if (!blogs) {
       return res.status(200).send({
         success: false,
@@ -29,7 +31,9 @@ exports.getAllBlogsController = async (req, res) => {
 };
 
 
-// ------------------------------------------------------------------------------ Create Blog
+// ---------------------------------------------------------------------------------- CREATE NEW BLOG
+
+
 exports.createBlogController = async (req, res) => {
   try {
     const { title, description, image, user } = req.body;
@@ -73,11 +77,15 @@ exports.createBlogController = async (req, res) => {
 };
 
 
-// ----------------------------------------------------------------------------------- Update Blog
+// --------------------------------------------------------------------------------------- UPDATE BLOG
+
+
 exports.updateBlogController = async (req, res) => {
   try {
     const { id } = req.params;
-    const blog = await blogModel.findByIdAndUpdate(id, { ...req.body }, { new: true });
+    console.log('BODY: ', req.body);
+    const blog = await blogModel.findByIdAndUpdate(id, { ...req.body }, { new: true }).populate("user")
+    console.log('NORMAL', blog);
     return res.status(200).send({
       success: true,
       message: "Blog Updated!",
@@ -94,7 +102,9 @@ exports.updateBlogController = async (req, res) => {
 };
 
 
-// ----------------------------------------------------------------------------------Single Blog
+// -------------------------------------------------------------------------------------------- GET SINGLE BLOG
+
+
 exports.getBlogByIdController = async (req, res) => {
   try {
     const { id } = req.params;
@@ -120,34 +130,54 @@ exports.getBlogByIdController = async (req, res) => {
   }
 };
 
-//Delete Blog
+
+// ------------------------------------------------------------------------------------------- DELETE BLOG
+
+
 exports.deleteBlogController = async (req, res) => {
   try {
     const blog = await blogModel
-      // .findOneAndDelete(req.params.id)
       .findByIdAndDelete(req.params.id)
       .populate("user");
     await blog.user.blogs.pull(blog);
     await blog.user.save();
     return res.status(200).send({
       success: true,
-      message: "Blog Deleted!",
+      message: "Blog Deleted Successfully",
     });
   } catch (error) {
     console.log(error);
     return res.status(400).send({
       success: false,
-      message: "Erorr WHile Deleteing BLog",
+      message: "Erorr While Deleteing Blog",
       error,
     });
   }
 };
 
 
-//GET USER BLOG
-exports.userBlogControlller = async (req, res) => {
+// ----------------------------------------------------------------------------------------------------- GET USER BLOGS
+
+
+exports.userBlogController = async (req, res) => {
   try {
-    const userBlog = await userModel.findById(req.params.id).populate("blogs");
+    let userBlog = await userModel.findById(req.params.id).populate("blogs");
+    // const userBlog = await userModel.findById(req.params.id).populate("blogs").populate("user");
+    let populatedBlog = [];
+
+    async function populateUserField() {
+      for (const blog of userBlog.blogs) {
+        try {
+          const user = await blog.populate("user");
+          populatedBlog.push(user)
+          // console.log('USER: ', populatedBlog);
+        } catch (error) {
+          console.error('Error populating user:', error.message);
+        }
+      }
+    }
+
+    await populateUserField()
 
     if (!userBlog) {
       return res.status(404).send({
@@ -158,7 +188,7 @@ exports.userBlogControlller = async (req, res) => {
     return res.status(200).send({
       success: true,
       message: "user blogs",
-      userBlog,
+      blogs: populatedBlog,
     });
   } catch (error) {
     console.log(error);

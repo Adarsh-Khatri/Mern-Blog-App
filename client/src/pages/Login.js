@@ -1,106 +1,91 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, TextField, Button } from "@mui/material";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { authActions } from "../redux/store";
 import toast from "react-hot-toast";
+import { useFormik } from "formik";
+import { postApi } from "../services/httpServices";
+import { setUser } from "../services/storageServices";
+
+
 const Login = () => {
+
   const navigate = useNavigate();
+
   const dispatch = useDispatch();
-  //state
-  const [inputs, setInputs] = useState({
-    email: "",
-    password: "",
-  });
 
-  //handle input change
-  const handleChange = (e) => {
-    setInputs((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  // ---------------------------------------------------------------------------------- LOGIN CREDENTIALS
 
-  //form handle
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const inputs = { email: "", password: "" };
+
+  // ------------------------------------------------------------------------------------------- HANDLING SUBMIT
+
+
+  const handleSubmit = async (values) => {
     try {
-      const { data } = await axios.post("/api/v1/user/login", {
-        email: inputs.email,
-        password: inputs.password,
-      });
-      if (data.success) {
-        localStorage.setItem("userId", data?.user._id);
+      const data = await postApi("/api/v1/user/login", { ...values });
+      if (data?.success) {
+        setUser(data?.user._id)
         dispatch(authActions.login());
-        toast.success("User login Successfully");
-        navigate("/");
+        toast.success(data.message);
+        navigate("/blogs");
       }
     } catch (error) {
-      console.log(error);
+      let { response } = error;
+      toast.error(response.data.message)
     }
   };
+
+
+  // ------------------------------------------------------------------------------------------- FORMIK 
+
+  const formik = useFormik({
+    initialValues: inputs,
+    onSubmit: handleSubmit
+  })
+
+
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <Box
-          maxWidth={450}
-          display="flex"
-          flexDirection={"column"}
-          alignItems="center"
-          justifyContent={"center"}
-          margin="auto"
-          marginTop={5}
-          boxShadow="10px 10px 20px #ccc"
-          padding={3}
-          borderRadius={5}
-        >
-          <Typography
-            variant="h4"
-            sx={{ textTransform: "uppercase" }}
-            padding={3}
-            textAlign="center"
-          >
-            Login
-          </Typography>
+    <div className="container">
+      <div className="row">
+        <form className="my-5 w-50 mx-auto" onSubmit={formik.handleSubmit}>
+          <div className="row">
+            <div className="border p-5 shadow-lg rounded rounded-5">
+              <div className="row">
+                <h1 className="text-center">Login</h1>
+              </div>
+              <div className="row">
+                <div className="form-group my-3">
+                  <label htmlFor="email" className="form-label lead fw-bold">Email</label>
+                  <input type="email" id="email" className="form-control py-3" name="email" value={formik.values.email} placeholder="Email" onChange={formik.handleChange} />
+                </div>
+                <div className="form-group my-3">
+                  <label htmlFor="password" className="form-label lead fw-bold">Password</label>
+                  <input type="password" id="password" className="form-control py-3" name="password" value={formik.values.password} placeholder="Password" onChange={formik.handleChange} />
+                </div>
 
-          <TextField
-            placeholder="email"
-            value={inputs.email}
-            name="email"
-            margin="normal"
-            type={"email"}
-            required
-            onChange={handleChange}
-          />
-          <TextField
-            placeholder="password"
-            value={inputs.password}
-            name="password"
-            margin="normal"
-            type={"password"}
-            required
-            onChange={handleChange}
-          />
-
-          <Button
-            type="submit"
-            sx={{ borderRadius: 3, marginTop: 3 }}
-            variant="contained"
-            color="primary"
-          >
-            Submit
-          </Button>
-          <Button
-            onClick={() => navigate("/register")}
-            sx={{ borderRadius: 3, marginTop: 3 }}
-          >
-            Not a user ? Please Register
-          </Button>
-        </Box>
-      </form>
-    </>
+              </div>
+              <div className="row">
+                <div className="text-center my-2">
+                  <button type="submit" className="btn btn-primary rounded-3">Submit</button>
+                </div>
+              </div>
+              <div className="row">
+                <div className="text-center mt-4">
+                  <button type="button" className="btn text-primary btn-sm border-0" onClick={() => navigate("/register")}>
+                    Not a user ? Please Register
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
 export default Login;
+
+
