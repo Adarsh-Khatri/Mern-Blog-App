@@ -103,7 +103,7 @@ export default function BlogCard({ title, description, image, username, time, id
             <div className="row">
               <div className="col-md">
                 <div className="modal fade" id={`blogModal${id}`} tabindex="-1" aria-labelledby={`exampleModalLabel${id}`} aria-hidden="true">
-                  <div className="modal-dialog modal-lg modal-dialog-scrollable">
+                  <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                     <div className="modal-content">
                       <div className="modal-header">
                         <h3 className="modal-title fw-bold" id={`exampleModalLabel${id}`}>{title}</h3>

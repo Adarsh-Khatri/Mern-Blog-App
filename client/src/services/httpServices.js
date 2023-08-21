@@ -1,8 +1,9 @@
 import axios from "axios";
 
-// "proxy": "http://localhost:8080",
 
-const baseURL = "http://localhost:8080";
+// const baseURL = "http://localhost:8080";
+
+const baseURL = "https://my-blog-app-nld1.onrender.com";
 
 
 

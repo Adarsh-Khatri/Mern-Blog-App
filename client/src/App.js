@@ -23,6 +23,7 @@ function App() {
         <Route path="/delete-blog/:id" element={<DeleteBlog />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </>
   );

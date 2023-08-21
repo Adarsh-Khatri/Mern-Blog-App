@@ -21,7 +21,6 @@ exports.getAllBlogsController = async (req, res) => {
       blogs,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({
       success: false,
       message: "Error While Getting All Blogs",
@@ -57,7 +56,7 @@ exports.createBlogController = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     await newBlog.save({ session });
-    exisitingUser.blogs.push(newBlog);
+    exisitingUser.blogs.push(newBlog._id);
     await exisitingUser.save({ session });
     await session.commitTransaction();
     await newBlog.save();
@@ -67,10 +66,9 @@ exports.createBlogController = async (req, res) => {
       newBlog,
     });
   } catch (error) {
-    console.log(error);
     return res.status(400).send({
       success: false,
-      message: "Error WHile Creting blog",
+      message: "Error While Creating blog",
       error,
     });
   }
@@ -83,16 +81,13 @@ exports.createBlogController = async (req, res) => {
 exports.updateBlogController = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('BODY: ', req.body);
     const blog = await blogModel.findByIdAndUpdate(id, { ...req.body }, { new: true }).populate("user")
-    console.log('NORMAL', blog);
     return res.status(200).send({
       success: true,
       message: "Blog Updated!",
       blog,
     });
   } catch (error) {
-    console.log(error);
     return res.status(400).send({
       success: false,
       message: "Error While Updating Blog",
@@ -117,14 +112,13 @@ exports.getBlogByIdController = async (req, res) => {
     }
     return res.status(200).send({
       success: true,
-      message: "fetch single blog",
+      message: "Got Blog By Id",
       blog,
     });
   } catch (error) {
-    console.log(error);
     return res.status(400).send({
       success: false,
-      message: "error while getting single blog",
+      message: "Error while getting single blog",
       error,
     });
   }
@@ -139,14 +133,13 @@ exports.deleteBlogController = async (req, res) => {
     const blog = await blogModel
       .findByIdAndDelete(req.params.id)
       .populate("user");
-    await blog.user.blogs.pull(blog);
+    await blog.user.blogs.pull(blog._id);
     await blog.user.save();
     return res.status(200).send({
       success: true,
       message: "Blog Deleted Successfully",
     });
   } catch (error) {
-    console.log(error);
     return res.status(400).send({
       success: false,
       message: "Erorr While Deleteing Blog",
@@ -162,7 +155,6 @@ exports.deleteBlogController = async (req, res) => {
 exports.userBlogController = async (req, res) => {
   try {
     let userBlog = await userModel.findById(req.params.id).populate("blogs");
-    // const userBlog = await userModel.findById(req.params.id).populate("blogs").populate("user");
     let populatedBlog = [];
 
     async function populateUserField() {
@@ -170,14 +162,13 @@ exports.userBlogController = async (req, res) => {
         try {
           const user = await blog.populate("user");
           populatedBlog.push(user)
-          // console.log('USER: ', populatedBlog);
         } catch (error) {
           console.error('Error populating user:', error.message);
         }
       }
     }
 
-    await populateUserField()
+    populateUserField()
 
     if (!userBlog) {
       return res.status(404).send({
@@ -191,7 +182,6 @@ exports.userBlogController = async (req, res) => {
       blogs: populatedBlog,
     });
   } catch (error) {
-    console.log(error);
     return res.status(400).send({
       success: false,
       message: "error in user blog",
